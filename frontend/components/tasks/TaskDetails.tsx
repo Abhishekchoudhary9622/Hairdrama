@@ -7,17 +7,7 @@ import { TaskStatusBadge, TaskPriorityBadge } from './TaskStatusBadge';
 import { UserSelector } from '@/components/users/UserSelector';
 import { api } from '@/lib/api';
 import { formatDate, formatDateTime, isOverdue } from '@/lib/utils';
-import {
-  X,
-  Calendar,
-  Clock,
-  User as UserIcon,
-  Activity,
-  History,
-  AlertCircle,
-  Trash2,
-  CheckCircle2,
-} from 'lucide-react';
+import { X, History, AlertCircle, Trash2, CheckCircle2 } from 'lucide-react';
 
 interface TaskDetailsProps {
   task: Task | null;
@@ -70,7 +60,6 @@ export function TaskDetails({
       setUpdating(true);
       setError(null);
       await onStatusChange(task.id, newStatus);
-      // Refresh activities
       const logs = await api.getTaskActivity(task.id);
       setActivities(logs);
     } catch (err: any) {
@@ -96,16 +85,14 @@ export function TaskDetails({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
+      <div className="relative w-full max-w-2xl bg-white border border-[#E5DDD2] rounded-[32px] shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60 flex-shrink-0">
+        <div className="px-6 py-5 border-b border-[#F0EAE1] flex items-center justify-between bg-[#FDFBF7] flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <TaskStatusBadge status={task.status} />
             <TaskPriorityBadge priority={task.priority} />
@@ -121,26 +108,26 @@ export function TaskDetails({
                     onClose();
                   }
                 }}
-                className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors"
+                className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition-colors"
                 title="Delete task (Creator only)"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             )}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+              className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center text-slate-500 shadow-xs transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-[#1A1A1A]">
           {error && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-600 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -148,19 +135,19 @@ export function TaskDetails({
 
           {/* Title & Description */}
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight mb-2">
+            <h2 className="text-xl font-extrabold text-[#1A1A1A] tracking-tight mb-2">
               {task.title}
             </h2>
-            <div className="text-sm text-slate-300 leading-relaxed bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80 whitespace-pre-wrap">
+            <div className="text-xs text-[#555] leading-relaxed bg-[#F7F2EC] p-4 rounded-2xl border border-[#E8E1D9] whitespace-pre-wrap">
               {task.description || 'No description provided.'}
             </div>
           </div>
 
           {/* Workflow & Assignment Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/30 p-4 rounded-2xl border border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#FBF8F4] p-4 rounded-2xl border border-[#E8E1D9]">
             {/* Status Transition Control */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              <label className="block text-xs font-bold text-[#1A1A1A] mb-2">
                 Workflow Status
               </label>
               {canUpdateStatus ? (
@@ -170,9 +157,9 @@ export function TaskDetails({
                       type="button"
                       disabled={updating}
                       onClick={() => handleStatusSelect('TODO')}
-                      className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white hover:bg-slate-50 text-[#555] border border-[#DDD5CC] transition-colors"
                     >
-                      Move to TODO
+                      To Do
                     </button>
                   )}
                   {task.status !== 'IN_PROGRESS' && (
@@ -180,7 +167,7 @@ export function TaskDetails({
                       type="button"
                       disabled={updating}
                       onClick={() => handleStatusSelect('IN_PROGRESS')}
-                      className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 transition-colors"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FFE8D6] hover:bg-[#FFDFC4] text-[#E65100] transition-colors"
                     >
                       In Progress
                     </button>
@@ -190,7 +177,7 @@ export function TaskDetails({
                       type="button"
                       disabled={updating}
                       onClick={() => handleStatusSelect('COMPLETED')}
-                      className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-colors flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#E6F7EC] hover:bg-[#D4F0DE] text-[#1E8E3E] transition-colors flex items-center gap-1.5"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Complete Task</span>
@@ -198,7 +185,7 @@ export function TaskDetails({
                   )}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-[#8E8E93]">
                   Only the task creator or assignee can transition status.
                 </p>
               )}
@@ -217,34 +204,34 @@ export function TaskDetails({
 
           {/* Metadata Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/80">
-              <span className="text-slate-400 block mb-1">Created By</span>
-              <span className="font-medium text-slate-200 truncate block">
+            <div className="p-3 bg-[#F7F2EC] rounded-2xl border border-[#E8E1D9]">
+              <span className="text-[#8E8E93] block mb-0.5 text-[10px] font-semibold">Created By</span>
+              <span className="font-bold text-[#1A1A1A] truncate block">
                 {task.creator?.name || 'Unknown'}
               </span>
             </div>
 
-            <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/80">
-              <span className="text-slate-400 block mb-1">Due Date</span>
+            <div className="p-3 bg-[#F7F2EC] rounded-2xl border border-[#E8E1D9]">
+              <span className="text-[#8E8E93] block mb-0.5 text-[10px] font-semibold">Due Date</span>
               <span
-                className={`font-medium block truncate ${
-                  overdue ? 'text-rose-400 font-semibold' : 'text-slate-200'
+                className={`font-bold block truncate ${
+                  overdue ? 'text-rose-600' : 'text-[#1A1A1A]'
                 }`}
               >
                 {formatDate(task.due_date)}
               </span>
             </div>
 
-            <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/80">
-              <span className="text-slate-400 block mb-1">Created</span>
-              <span className="font-medium text-slate-200 block truncate">
+            <div className="p-3 bg-[#F7F2EC] rounded-2xl border border-[#E8E1D9]">
+              <span className="text-[#8E8E93] block mb-0.5 text-[10px] font-semibold">Created</span>
+              <span className="font-bold text-[#1A1A1A] block truncate">
                 {formatDate(task.created_at)}
               </span>
             </div>
 
-            <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/80">
-              <span className="text-slate-400 block mb-1">Completed</span>
-              <span className="font-medium text-slate-200 block truncate">
+            <div className="p-3 bg-[#F7F2EC] rounded-2xl border border-[#E8E1D9]">
+              <span className="text-[#8E8E93] block mb-0.5 text-[10px] font-semibold">Completed</span>
+              <span className="font-bold text-[#1A1A1A] block truncate">
                 {task.completed_at ? formatDate(task.completed_at) : 'Incomplete'}
               </span>
             </div>
@@ -253,31 +240,31 @@ export function TaskDetails({
           {/* Activity History Audit Trail */}
           <div className="pt-2">
             <div className="flex items-center gap-2 mb-3">
-              <History className="w-4 h-4 text-indigo-400" />
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <History className="w-4 h-4 text-[#F15A24]" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
                 Activity Audit Trail
               </h3>
             </div>
 
             <div className="space-y-3">
               {loadingActivities ? (
-                <div className="text-xs text-slate-500 py-3 text-center">Loading audit history...</div>
+                <div className="text-xs text-[#8E8E93] py-3 text-center">Loading audit history...</div>
               ) : activities.length === 0 ? (
-                <div className="text-xs text-slate-500 py-2">No activity logged yet.</div>
+                <div className="text-xs text-[#8E8E93] py-2">No activity logged yet.</div>
               ) : (
-                <div className="relative border-l border-slate-800 ml-3 space-y-4 py-1">
+                <div className="relative border-l border-[#E2DBD2] ml-3 space-y-4 py-1">
                   {activities.map((act) => (
                     <div key={act.id} className="relative pl-6">
-                      <div className="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-slate-800 border-2 border-indigo-500" />
+                      <div className="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-white border-2 border-[#F15A24]" />
                       <div className="flex items-center justify-between gap-2 text-xs">
-                        <span className="font-medium text-slate-300">
+                        <span className="font-bold text-[#1A1A1A]">
                           {act.user?.name || 'System User'}
                         </span>
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-[#8E8E93]">
                           {formatDateTime(act.created_at)}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-[#555] mt-0.5">
                         {act.action === 'CREATED_TASK' && `Created task with initial state`}
                         {act.action === 'STATUS_CHANGED' &&
                           `Changed status from ${act.old_value} to ${act.new_value}`}

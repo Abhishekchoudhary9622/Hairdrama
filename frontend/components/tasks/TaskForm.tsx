@@ -5,7 +5,7 @@ import { TaskPriority } from '@/types/task';
 import { User } from '@/types/user';
 import { UserSelector } from '@/components/users/UserSelector';
 import { TASK_PRIORITIES } from '@/lib/constants';
-import { X, Plus, AlertCircle, Calendar } from 'lucide-react';
+import { X, Plus, AlertCircle } from 'lucide-react';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -51,7 +51,6 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
         assigned_to: assignedToUser.id,
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
       });
-      // Reset & close
       setTitle('');
       setDescription('');
       setPriority('MEDIUM');
@@ -69,31 +68,31 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150">
-        <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+      <div className="relative w-full max-w-lg bg-white border border-[#E5DDD2] rounded-[32px] shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150">
+        <div className="px-6 py-5 border-b border-[#F0EAE1] flex items-center justify-between bg-[#FDFBF7]">
           <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">Create New Task</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Assign a new item to a team member and trigger automated email alerts.
+            <h2 className="text-base font-extrabold text-[#1A1A1A] tracking-tight">Create New Task</h2>
+            <p className="text-xs text-[#8E8E93] mt-0.5">
+              Assign deliverables to team members with automated email notifications.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center text-slate-500 shadow-xs transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-600 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -101,8 +100,8 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-              Task Title <span className="text-rose-400">*</span>
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">
+              Task Title <span className="text-[#F15A24]">*</span>
             </label>
             <input
               type="text"
@@ -110,21 +109,21 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Fix authentication token refresh"
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full px-4 py-2.5 bg-[#F7F2EC] border border-[#E5DDD2] rounded-2xl text-xs text-[#1A1A1A] placeholder-[#8E8E93] focus:outline-none focus:border-[#F15A24]"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">
               Description
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide context, acceptance criteria, or links..."
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
+              placeholder="Provide scope, requirements, or links..."
+              className="w-full px-4 py-2.5 bg-[#F7F2EC] border border-[#E5DDD2] rounded-2xl text-xs text-[#1A1A1A] placeholder-[#8E8E93] focus:outline-none focus:border-[#F15A24] resize-none"
             />
           </div>
 
@@ -137,23 +136,21 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
             />
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">
                 Due Date
               </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                />
-              </div>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full px-4 py-2.5 bg-[#F7F2EC] border border-[#E5DDD2] rounded-2xl text-xs text-[#1A1A1A] focus:outline-none focus:border-[#F15A24]"
+              />
             </div>
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">
               Priority
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -164,10 +161,10 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
                     key={p.value}
                     type="button"
                     onClick={() => setPriority(p.value as TaskPriority)}
-                    className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
+                    className={`py-2 px-3 rounded-full text-xs font-bold transition-all ${
                       isSelected
-                        ? `${p.color} ring-2 ring-indigo-500/50`
-                        : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700'
+                        ? 'bg-[#141414] text-white shadow-sm ring-2 ring-[#F15A24]'
+                        : 'bg-[#F7F2EC] text-[#555] hover:bg-[#EFE9E0]'
                     }`}
                   >
                     {p.label}
@@ -178,19 +175,19 @@ export function TaskForm({ isOpen, onClose, onSubmit }: TaskFormProps) {
           </div>
 
           {/* Form Actions */}
-          <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-[#F5EFE9] flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors"
+              className="px-5 py-2.5 rounded-full border border-[#DDD5CC] text-xs font-bold text-[#555] hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 rounded-full bg-[#F15A24] hover:bg-[#E04E1B] text-xs font-bold text-white shadow-md shadow-orange-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
             >
               <Plus className="w-4 h-4" />
               <span>{submitting ? 'Creating...' : 'Create Task'}</span>

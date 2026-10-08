@@ -39,6 +39,7 @@ function TasksContent() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -48,81 +49,99 @@ function TasksContent() {
 
   if (authLoading || (!user && typeof window !== 'undefined')) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
-        <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span>Authenticating...</span>
+      <div className="min-h-screen bg-[#EBE4DD] flex items-center justify-center text-[#8E8E93]">
+        <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-sm">
+          <div className="w-4 h-4 border-2 border-[#F15A24] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-semibold text-[#1A1A1A]">Loading tasks...</span>
         </div>
       </div>
     );
   }
 
+  const displayedTasks = tasks.filter((t) => {
+    if (!searchQuery) return true;
+    return (
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navbar onToggleSidebar={() => setMobileNavOpen(true)} />
-      <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+    <div className="min-h-screen bg-[#EBE4DD] p-2 sm:p-4 lg:p-6 flex items-center justify-center">
+      <div className="w-full max-w-[1560px] bg-[#F7F2EC] border border-[#E5DDD2] rounded-[28px] sm:rounded-[36px] shadow-2xl flex overflow-hidden min-h-[92vh]">
+        <Sidebar
+          className="hidden lg:flex"
+          onCreateTask={() => setCreateModalOpen(true)}
+        />
+        <MobileNav
+          isOpen={mobileNavOpen}
+          onClose={() => setMobileNavOpen(false)}
+        />
 
-      <div className="flex-1 flex overflow-hidden">
-        <Sidebar className="hidden lg:flex" />
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          <Navbar
+            title="All Tasks"
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            onToggleSidebar={() => setMobileNavOpen(true)}
+          />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <CheckSquare className="w-6 h-6 text-indigo-400" />
-                <h1 className="text-2xl font-extrabold text-white tracking-tight">
-                  Task Management
-                </h1>
+          <main className="p-4 sm:p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-extrabold text-[#1A1A1A] tracking-tight">
+                  Task Deliverables
+                </h2>
+                <p className="text-xs text-[#8E8E93] mt-0.5">
+                  Filter, assign, and track project tasks with deterministic state machines.
+                </p>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                Filter, track, and update all assigned and created task deliverables.
-              </p>
+
+              <button
+                type="button"
+                onClick={() => setCreateModalOpen(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F15A24] hover:bg-[#E04E1B] text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create Task</span>
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setCreateModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 transition-all"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Create Task</span>
-            </button>
-          </div>
+            <TaskFilters filters={filters} onChange={setFilters} />
 
-          <TaskFilters filters={filters} onChange={setFilters} />
-
-          {tasksLoading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs">Loading tasks...</span>
-            </div>
-          ) : tasks.length === 0 ? (
-            <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-12 text-center space-y-3">
-              <Inbox className="w-10 h-10 text-slate-600 mx-auto" />
-              <h3 className="text-base font-semibold text-slate-300">No tasks found</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                No tasks match your selected view or criteria.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {tasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  currentUser={user}
-                  onSelectTask={(t) => setSelectedTask(t)}
-                  onStatusChange={async (id, status) => {
-                    await updateStatus(id, status);
-                  }}
-                  onDeleteTask={async (id) => {
-                    await deleteTask(id);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </main>
+            {tasksLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
+                <div className="w-6 h-6 border-2 border-[#F15A24] border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs">Loading task collection...</span>
+              </div>
+            ) : displayedTasks.length === 0 ? (
+              <div className="bg-white border border-[#E8E1D9] rounded-[28px] p-12 text-center space-y-3">
+                <Inbox className="w-8 h-8 text-slate-400 mx-auto" />
+                <h3 className="text-sm font-bold text-[#1A1A1A]">No tasks found</h3>
+                <p className="text-xs text-[#8E8E93] max-w-sm mx-auto">
+                  No tasks match your selected view or search criteria.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {displayedTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    currentUser={user}
+                    onSelectTask={(t) => setSelectedTask(t)}
+                    onStatusChange={async (id, status) => {
+                      await updateStatus(id, status);
+                    }}
+                    onDeleteTask={async (id) => {
+                      await deleteTask(id);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
 
       <TaskForm
@@ -156,7 +175,7 @@ function TasksContent() {
 
 export default function TasksPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#EBE4DD]" />}>
       <TasksContent />
     </Suspense>
   );

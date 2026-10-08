@@ -15,29 +15,27 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-xl transition-colors border border-transparent hover:border-slate-700/60"
+        className="w-8 h-8 rounded-full bg-white hover:bg-slate-50 flex items-center justify-center text-[#1A1A1A] transition-colors relative shadow-2xs"
         title="Notifications"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-4 h-4 text-[#444]" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white shadow-lg animate-pulse">
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </span>
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#F15A24] ring-2 ring-white animate-pulse" />
         )}
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl z-50 overflow-hidden divide-y divide-slate-800">
+          <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#E5DDD2] rounded-2xl shadow-xl z-50 overflow-hidden divide-y divide-[#F0EAE1]">
             {/* Header */}
-            <div className="px-4 py-3 flex items-center justify-between bg-slate-800/50">
+            <div className="px-4 py-3 flex items-center justify-between bg-[#FDFBF7]">
               <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-indigo-400" />
-                <span className="text-sm font-semibold text-white">Notifications</span>
+                <Bell className="w-3.5 h-3.5 text-[#F15A24]" />
+                <span className="text-xs font-bold text-[#1A1A1A]">Notifications</span>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#FFF0E6] text-[#E65100]">
                     {unreadCount} new
                   </span>
                 )}
@@ -46,18 +44,18 @@ export function NotificationBell() {
                 <button
                   type="button"
                   onClick={() => refreshNotifications()}
-                  className="p-1 text-slate-400 hover:text-slate-200 transition-colors"
-                  title="Refresh"
+                  className="p-1 text-[#8E8E93] hover:text-[#1A1A1A] transition-colors cursor-pointer"
+                  title="Refresh alerts"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3 h-3" />
                 </button>
                 {unreadCount > 0 && (
                   <button
                     type="button"
                     onClick={() => markAllAsRead()}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors"
+                    className="text-[11px] text-[#F15A24] hover:underline flex items-center gap-1 font-bold cursor-pointer"
                   >
-                    <CheckCheck className="w-3.5 h-3.5" />
+                    <CheckCheck className="w-3 h-3" />
                     <span>Mark all read</span>
                   </button>
                 )}
@@ -65,13 +63,13 @@ export function NotificationBell() {
             </div>
 
             {/* Notification List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-slate-800/60">
+            <div className="max-h-80 overflow-y-auto divide-y divide-[#F9F6F0]">
               {notifications.length === 0 ? (
                 <div className="py-8 px-4 text-center">
-                  <Inbox className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                  <p className="text-sm text-slate-400">No notifications yet</p>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    You will receive alerts here when tasks are assigned or completed.
+                  <Inbox className="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                  <p className="text-xs font-bold text-[#1A1A1A]">No notifications yet</p>
+                  <p className="text-[10px] text-[#8E8E93] mt-0.5">
+                    Real-time alerts appear when tasks are assigned or completed.
                   </p>
                 </div>
               ) : (
@@ -81,43 +79,43 @@ export function NotificationBell() {
                     onClick={() => {
                       if (!item.is_read) markAsRead(item.id);
                     }}
-                    className={`p-3.5 text-left transition-colors cursor-pointer flex gap-3 ${
+                    className={`p-3 text-left transition-colors cursor-pointer flex gap-3 ${
                       item.is_read
-                        ? 'bg-slate-900/50 opacity-70 hover:opacity-100 hover:bg-slate-800/40'
-                        : 'bg-indigo-950/20 hover:bg-indigo-950/40 border-l-2 border-indigo-500'
+                        ? 'bg-white opacity-75 hover:opacity-100 hover:bg-[#FAF7F2]'
+                        : 'bg-[#FFF9F5] hover:bg-[#FFF4EC] border-l-3 border-[#F15A24]'
                     }`}
                   >
                     <div className="mt-0.5">
                       {item.type === 'TASK_ASSIGNED' && (
-                        <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                          <UserPlus className="w-3.5 h-3.5" />
+                        <div className="w-6 h-6 rounded-full bg-[#FFF0E6] text-[#E65100] flex items-center justify-center">
+                          <UserPlus className="w-3 h-3" />
                         </div>
                       )}
                       {item.type === 'TASK_COMPLETED' && (
-                        <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                          <CheckCircle className="w-3.5 h-3.5" />
+                        <div className="w-6 h-6 rounded-full bg-[#E6F7EC] text-[#1E8E3E] flex items-center justify-center">
+                          <CheckCircle className="w-3 h-3" />
                         </div>
                       )}
                       {item.type !== 'TASK_ASSIGNED' && item.type !== 'TASK_COMPLETED' && (
-                        <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400">
-                          <Bell className="w-3.5 h-3.5" />
+                        <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
+                          <Bell className="w-3 h-3" />
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
                         <span
-                          className={`text-xs font-semibold truncate ${
-                            item.is_read ? 'text-slate-300' : 'text-white'
+                          className={`text-xs truncate ${
+                            item.is_read ? 'font-medium text-[#555]' : 'font-bold text-[#1A1A1A]'
                           }`}
                         >
                           {item.title}
                         </span>
-                        <span className="text-[10px] text-slate-500 flex-shrink-0">
+                        <span className="text-[9px] text-[#8E8E93] flex-shrink-0">
                           {formatDateTime(item.created_at)}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-[#666] line-clamp-2 leading-snug">
                         {item.message}
                       </p>
                     </div>

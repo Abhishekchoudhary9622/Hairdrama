@@ -3,7 +3,7 @@
 import React from 'react';
 import { TaskFiltersState } from '@/types/task';
 import { TASK_STATUSES, TASK_PRIORITIES } from '@/lib/constants';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 interface TaskFiltersProps {
   filters: TaskFiltersState;
@@ -27,22 +27,22 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
   return (
     <div className="space-y-3">
       {/* Search and Dropdowns Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
         {/* Search input */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
           <input
             type="text"
             value={filters.search || ''}
             onChange={(e) => onChange({ ...filters, search: e.target.value })}
             placeholder="Search tasks by title or keyword..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#E8E1D9] rounded-full text-xs text-[#1A1A1A] placeholder-[#8E8E93] focus:outline-none focus:border-[#F15A24]/50 shadow-xs"
           />
           {filters.search && (
             <button
               type="button"
               onClick={() => onChange({ ...filters, search: '' })}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -51,38 +51,48 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
 
         {/* Status Dropdown */}
         <div className="flex items-center gap-2">
-          <select
-            value={filters.status || ''}
-            onChange={(e) => onChange({ ...filters, status: e.target.value })}
-            className="px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-xs font-medium text-slate-300 focus:outline-none focus:border-indigo-500"
-          >
-            <option value="">All Statuses</option>
-            {TASK_STATUSES.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={filters.status || ''}
+              onChange={(e) => onChange({ ...filters, status: e.target.value })}
+              className="appearance-none bg-white border border-[#E8E1D9] rounded-full px-3.5 py-2 pr-7 text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:border-[#F15A24]/50 shadow-xs cursor-pointer"
+            >
+              <option value="">All Statuses</option>
+              {TASK_STATUSES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] pointer-events-none text-[#8E8E93]">
+              ▼
+            </span>
+          </div>
 
           {/* Priority Dropdown */}
-          <select
-            value={filters.priority || ''}
-            onChange={(e) => onChange({ ...filters, priority: e.target.value })}
-            className="px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-xs font-medium text-slate-300 focus:outline-none focus:border-indigo-500"
-          >
-            <option value="">All Priorities</option>
-            {TASK_PRIORITIES.map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={filters.priority || ''}
+              onChange={(e) => onChange({ ...filters, priority: e.target.value })}
+              className="appearance-none bg-white border border-[#E8E1D9] rounded-full px-3.5 py-2 pr-7 text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:border-[#F15A24]/50 shadow-xs cursor-pointer"
+            >
+              <option value="">All Priorities</option>
+              {TASK_PRIORITIES.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] pointer-events-none text-[#8E8E93]">
+              ▼
+            </span>
+          </div>
 
           {hasActiveFilters && (
             <button
               type="button"
               onClick={handleClear}
-              className="px-3 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-full bg-white border border-[#E8E1D9] text-[#777] hover:text-[#1A1A1A] text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs"
               title="Reset all filters"
             >
               <X className="w-3.5 h-3.5" />
@@ -105,10 +115,10 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
               key={tab.id}
               type="button"
               onClick={() => onChange({ ...filters, view: tab.id as any })}
-              className={`px-3.5 py-1.5 rounded-full font-medium transition-all ${
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                 isSelected
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'bg-slate-900/70 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                  ? 'bg-[#141414] text-white shadow-xs'
+                  : 'bg-white border border-[#E8E1D9] text-[#777] hover:text-[#1A1A1A]'
               }`}
             >
               {tab.label}

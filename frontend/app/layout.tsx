@@ -3,8 +3,8 @@ import './globals.css';
 import { AuthProvider } from '@/hooks/useAuth';
 
 export const metadata: Metadata = {
-  title: 'Hairdrama Tech — Task Management System',
-  description: 'Enterprise task management and workflow execution platform',
+  title: 'Hairdrama — Enterprise Task Management System',
+  description: 'Next-generation project and workflow dashboard platform',
 };
 
 export default function RootLayout({
@@ -13,8 +13,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark h-full">
-      <body className="min-h-full bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+    <html lang="en" className="h-full">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+        className="min-h-full bg-[#EBE4DD] text-[#1A1A1A] antialiased selection:bg-[#F15A24] selection:text-white"
+      >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
