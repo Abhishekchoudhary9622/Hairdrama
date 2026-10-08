@@ -11,17 +11,19 @@ import { TaskCard } from '@/components/tasks/TaskCard';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskDetails } from '@/components/tasks/TaskDetails';
 import { TaskFilters } from '@/components/tasks/TaskFilters';
-import { Task, TaskStatus } from '@/types/task';
+import { Task } from '@/types/task';
 import { isOverdue } from '@/lib/utils';
 import {
   Plus,
   Inbox,
   Kanban,
   LayoutGrid,
-  Clock,
-  Calendar,
   CheckCircle2,
+  CheckSquare,
+  Layers,
+  UserCheck,
   AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
 
 function TasksContent() {
@@ -29,8 +31,15 @@ function TasksContent() {
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
 
-  const initialView = (searchParams.get('view') as any) || 'assigned';
-  const initialStatus = searchParams.get('status') || '';
+  const urlView = searchParams.get('view') || '';
+  const urlStatus = searchParams.get('status') || '';
+
+  // Derive effective view & status from URL with strict type
+  const effectiveStatus = urlStatus;
+  const effectiveView: 'all' | 'created' | 'assigned' =
+    urlView === 'all' || urlView === 'created' || urlView === 'assigned'
+      ? (urlView as 'all' | 'created' | 'assigned')
+      : (urlStatus ? 'all' : 'assigned');
 
   const {
     tasks,
@@ -43,8 +52,8 @@ function TasksContent() {
     reassignTask,
     deleteTask,
   } = useTasks({
-    view: initialView,
-    status: initialStatus,
+    view: effectiveView,
+    status: effectiveStatus,
   });
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -52,6 +61,15 @@ function TasksContent() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'board' | 'grid'>('board');
+
+  // Keep filters synced whenever the URL search params change
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      view: effectiveView,
+      status: effectiveStatus,
+    }));
+  }, [effectiveView, effectiveStatus, setFilters]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -85,28 +103,64 @@ function TasksContent() {
   const completedTasks = displayedTasks.filter((t) => t.status === 'COMPLETED');
   const overdueTasks = displayedTasks.filter((t) => isOverdue(t.due_date, t.status));
 
-  // Determine dynamic title
+  // Determine distinctive dynamic title, subtitle, icon, and badge based on the 3 routes
   let pageTitle = 'All Deliverables';
-  let pageSubtitle = 'All deliverables and roadmap items across the team.';
-  if (filters.view === 'assigned' || (!filters.view && !filters.status)) {
+  let pageSubtitle = 'Complete company-wide roadmap across all team members.';
+  let pageIcon = Layers;
+  let pageBadgeText = 'All 24 Deliverables';
+  let pageBadgeClass = 'bg-purple-100 text-purple-700';
+
+  if (effectiveStatus === 'COMPLETED') {
+    pageTitle = 'Completed Deliverables';
+    pageSubtitle = 'Archive of successfully delivered, approved, and verified tasks.';
+    pageIcon = CheckCircle2;
+    pageBadgeText = 'Finished & Verified';
+    pageBadgeClass = 'bg-[#E6F7EC] text-[#1E8E3E]';
+  } else if (effectiveView === 'created') {
+    pageTitle = 'Tasks Created by Me';
+    pageSubtitle = 'Deliverables and requests initiated and delegated by you.';
+    pageIcon = UserCheck;
+    pageBadgeText = 'Initiated by You';
+    pageBadgeClass = 'bg-blue-100 text-blue-700';
+  } else if (effectiveView === 'assigned') {
     pageTitle = 'My Tasks';
     pageSubtitle = 'Tasks assigned to you that require your active execution or review.';
-  } else if (filters.view === 'created') {
-    pageTitle = 'Created by Me';
-    pageSubtitle = 'Tasks and deliverables you initiated and delegated.';
-  } else if (filters.status === 'COMPLETED') {
-    pageTitle = 'Completed Tasks';
-    pageSubtitle = 'Successfully delivered and approved work items.';
-  } else if (filters.status === 'IN_PROGRESS') {
-    pageTitle = 'Active / In Progress';
-    pageSubtitle = 'Workstreams currently in execution.';
-  } else if (filters.status === 'TODO') {
-    pageTitle = 'To Do Deliverables';
-    pageSubtitle = 'Pending backlog awaiting kickoff.';
-  } else if (filters.status === 'OVERDUE') {
-    pageTitle = 'Overdue Tasks';
-    pageSubtitle = 'Tasks that have exceeded their target deadline.';
+    pageIcon = CheckSquare;
+    pageBadgeText = 'Assigned to You';
+    pageBadgeClass = 'bg-[#FFF0E6] text-[#E65100]';
   }
+
+  const PageIconComponent = pageIcon;
+
+  // Handle navigation when clicking ownership tabs
+  const handleOwnershipTabClick = (tabId: string) => {
+    if (tabId === 'assigned') {
+      router.push('/tasks?view=assigned');
+    } else if (tabId === 'created') {
+      router.push('/tasks?view=created');
+    } else {
+      router.push('/tasks?view=all');
+    }
+  };
+
+  // Handle navigation when clicking status segment pills
+  const handleStatusPillClick = (statusId: string) => {
+    if (statusId === 'COMPLETED') {
+      router.push('/tasks?status=COMPLETED');
+    } else if (statusId) {
+      const baseView = effectiveView === 'assigned' ? '' : `&view=${effectiveView}`;
+      router.push(`/tasks?status=${statusId}${baseView}`);
+    } else {
+      // Clear status
+      if (effectiveView === 'all') {
+        router.push('/tasks?view=all');
+      } else if (effectiveView === 'created') {
+        router.push('/tasks?view=created');
+      } else {
+        router.push('/tasks?view=assigned');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#EBE4DD] p-2 sm:p-4 lg:p-6 flex items-center justify-center">
@@ -129,47 +183,59 @@ function TasksContent() {
           />
 
           <main className="p-4 sm:p-6 space-y-5">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/70 backdrop-blur-sm p-5 rounded-[24px] border border-[#E8E1D9] shadow-xs">
-              <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[#1A1A1A] tracking-tight">
-                  {pageTitle}
-                </h1>
-                <p className="text-xs sm:text-sm text-[#777] mt-0.5">
-                  {pageSubtitle}
-                </p>
+            {/* Page Header with Distinctive Branding & Icons */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/70 backdrop-blur-sm p-5 sm:p-6 rounded-[24px] border border-[#E8E1D9] shadow-xs">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-white border border-[#E8E1D9] flex items-center justify-center shadow-xs flex-shrink-0">
+                  <PageIconComponent className="w-6 h-6 text-[#F15A24]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl font-extrabold text-[#1A1A1A] tracking-tight">
+                      {pageTitle}
+                    </h1>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${pageBadgeClass}`}>
+                      {pageBadgeText}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#777] mt-0.5">
+                    {pageSubtitle}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 self-start sm:self-auto">
                 {/* View Mode Toggle (Board vs Grid) */}
-                <div className="bg-[#F7F2EC] p-1 rounded-full border border-[#E5DDD2] flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('board')}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                      viewMode === 'board'
-                        ? 'bg-[#141414] text-white shadow-xs'
-                        : 'text-[#777] hover:text-[#1A1A1A]'
-                    }`}
-                    title="Kanban Board View (Separated by Status Columns)"
-                  >
-                    <Kanban className="w-3.5 h-3.5" />
-                    <span>Board</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                      viewMode === 'grid'
-                        ? 'bg-[#141414] text-white shadow-xs'
-                        : 'text-[#777] hover:text-[#1A1A1A]'
-                    }`}
-                    title="Grid / List View"
-                  >
-                    <LayoutGrid className="w-3.5 h-3.5" />
-                    <span>List</span>
-                  </button>
-                </div>
+                {effectiveStatus !== 'COMPLETED' && (
+                  <div className="bg-[#F7F2EC] p-1 rounded-full border border-[#E5DDD2] flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('board')}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                        viewMode === 'board'
+                          ? 'bg-[#141414] text-white shadow-xs'
+                          : 'text-[#777] hover:text-[#1A1A1A]'
+                      }`}
+                      title="Kanban Board View (Separated by Status Columns)"
+                    >
+                      <Kanban className="w-3.5 h-3.5" />
+                      <span>Board</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('grid')}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                        viewMode === 'grid'
+                          ? 'bg-[#141414] text-white shadow-xs'
+                          : 'text-[#777] hover:text-[#1A1A1A]'
+                      }`}
+                      title="Grid / List View"
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      <span>List</span>
+                    </button>
+                  </div>
+                )}
 
                 <button
                   type="button"
@@ -182,7 +248,7 @@ function TasksContent() {
               </div>
             </div>
 
-            {/* Quick Status Segment Filter Pills */}
+            {/* Quick Filter Bar: Ownership Tabs & Status Segment Pills */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-[22px] border border-[#E8E1D9] shadow-xs">
               {/* Ownership Tabs */}
               <div className="flex items-center gap-1.5 overflow-x-auto text-xs">
@@ -191,12 +257,12 @@ function TasksContent() {
                   { id: 'created', label: 'Created By Me' },
                   { id: 'all', label: 'All Deliverables' },
                 ].map((tab) => {
-                  const isSelected = (filters.view || 'assigned') === tab.id;
+                  const isSelected = effectiveView === tab.id && !effectiveStatus;
                   return (
                     <button
                       key={tab.id}
                       type="button"
-                      onClick={() => setFilters({ ...filters, view: tab.id as any })}
+                      onClick={() => handleOwnershipTabClick(tab.id)}
                       className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-[#141414] text-white shadow-xs'
@@ -209,7 +275,7 @@ function TasksContent() {
                 })}
               </div>
 
-              {/* Status Filter Pills with Counts */}
+              {/* Status Filter Pills with Live Counter Badges */}
               <div className="flex items-center gap-1.5 overflow-x-auto text-xs">
                 {[
                   { id: '', label: 'All', count: displayedTasks.length, color: 'bg-slate-100 text-slate-700' },
@@ -218,12 +284,12 @@ function TasksContent() {
                   { id: 'COMPLETED', label: 'Done', count: completedTasks.length, color: 'bg-[#E6F7EC] text-[#1E8E3E]' },
                   { id: 'OVERDUE', label: 'Overdue', count: overdueTasks.length, color: 'bg-[#FCE8E6] text-[#D93025]' },
                 ].map((pill) => {
-                  const isSelected = (filters.status || '') === pill.id;
+                  const isSelected = effectiveStatus === pill.id;
                   return (
                     <button
                       key={pill.id}
                       type="button"
-                      onClick={() => setFilters({ ...filters, status: pill.id })}
+                      onClick={() => handleStatusPillClick(pill.id)}
                       className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                         isSelected
                           ? 'bg-[#F15A24] text-white shadow-xs'
@@ -251,7 +317,7 @@ function TasksContent() {
             {tasksLoading ? (
               <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
                 <div className="w-6 h-6 border-2 border-[#F15A24] border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs">Loading tasks...</span>
+                <span className="text-xs font-medium">Loading deliverables...</span>
               </div>
             ) : displayedTasks.length === 0 ? (
               <div className="bg-white border border-[#E8E1D9] rounded-[28px] p-12 text-center space-y-3 shadow-xs">
@@ -260,6 +326,42 @@ function TasksContent() {
                 <p className="text-xs text-[#8E8E93] max-w-sm mx-auto">
                   Try switching to &quot;All Deliverables&quot; or clearing your active filters.
                 </p>
+              </div>
+            ) : effectiveStatus === 'COMPLETED' ? (
+              /* DEDICATED COMPLETED VIEW: Clean Grid with Delivery Timestamps & Reopen Options */
+              <div className="space-y-4">
+                <div className="bg-[#EBF7EF] border border-[#D0EED9] rounded-[24px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-[#1E8E3E] text-white flex items-center justify-center shadow-xs">
+                      <CheckCircle2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-[#1E8E3E]">
+                        Completed Deliverables Archive ({completedTasks.length})
+                      </h2>
+                      <p className="text-xs text-[#555]">
+                        All work items that have reached their terminal completion state with verified timestamps.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {completedTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      currentUser={user}
+                      onSelectTask={(t) => setSelectedTask(t)}
+                      onStatusChange={async (id, status) => {
+                        await updateStatus(id, status);
+                      }}
+                      onDeleteTask={async (id) => {
+                        await deleteTask(id);
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             ) : viewMode === 'board' ? (
               /* KANBAN BOARD VIEW: 3 Dedicated Workflow Columns */
@@ -381,7 +483,7 @@ function TasksContent() {
             ) : (
               /* GRID VIEW: Organized with Status Section Headers */
               <div className="space-y-6">
-                {inProgressTasks.length > 0 && (!filters.status || filters.status === 'IN_PROGRESS') && (
+                {inProgressTasks.length > 0 && (!effectiveStatus || effectiveStatus === 'IN_PROGRESS') && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-xs font-extrabold text-[#E65100]">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#E65100]" />
@@ -406,7 +508,7 @@ function TasksContent() {
                   </div>
                 )}
 
-                {todoTasks.length > 0 && (!filters.status || filters.status === 'TODO' || filters.status === 'OVERDUE') && (
+                {todoTasks.length > 0 && (!effectiveStatus || effectiveStatus === 'TODO' || effectiveStatus === 'OVERDUE') && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-xs font-extrabold text-[#1A1A1A]">
                       <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
@@ -431,7 +533,7 @@ function TasksContent() {
                   </div>
                 )}
 
-                {completedTasks.length > 0 && (!filters.status || filters.status === 'COMPLETED') && (
+                {completedTasks.length > 0 && (!effectiveStatus || effectiveStatus === 'COMPLETED') && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-xs font-extrabold text-[#1E8E3E]">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#1E8E3E]" />

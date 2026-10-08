@@ -29,7 +29,7 @@ function SidebarNavList({ onClose }: { onClose?: () => void }) {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Tasks', href: '/tasks?view=assigned', icon: CheckSquare },
     { name: 'All Tasks', href: '/tasks?view=all', icon: Layers },
-    { name: 'Completed', href: '/tasks?status=COMPLETED', icon: CheckCircle2 },
+    { name: 'Completed', href: '/tasks?status=COMPLETED&view=all', icon: CheckCircle2 },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
@@ -43,9 +43,9 @@ function SidebarNavList({ onClose }: { onClose?: () => void }) {
           isActive = pathname.startsWith('/settings');
         } else if (pathname === '/tasks') {
           if (item.href === '/tasks?view=assigned') {
-            isActive = currentView === 'assigned' || (!currentView && !currentStatus);
+            isActive = (currentView === 'assigned' && !currentStatus) || (!currentView && !currentStatus);
           } else if (item.href === '/tasks?view=all') {
-            isActive = currentView === 'all';
+            isActive = currentView === 'all' && !currentStatus;
           } else if (item.href === '/tasks?status=COMPLETED') {
             isActive = currentStatus === 'COMPLETED';
           }

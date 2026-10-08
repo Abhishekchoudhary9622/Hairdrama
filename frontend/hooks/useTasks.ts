@@ -17,6 +17,18 @@ export function useTasks(initialFilters?: TaskFiltersState) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters((prev) => ({
+        ...prev,
+        view: initialFilters.view,
+        status: initialFilters.status,
+        priority: initialFilters.priority,
+        search: initialFilters.search,
+      }));
+    }
+  }, [initialFilters?.view, initialFilters?.status, initialFilters?.priority, initialFilters?.search]);
+
   const fetchTasksAndStats = useCallback(async () => {
     try {
       setLoading(true);

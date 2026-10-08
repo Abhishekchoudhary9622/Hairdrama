@@ -55,7 +55,10 @@ class TaskRepository:
             query["created_by"] = current_user_id
         elif view == "assigned" and current_user_id:
             query["assigned_to"] = current_user_id
-        elif current_user_id and view != "all_system":
+        elif view in ("all", "all_system"):
+            # Return all deliverables across team
+            pass
+        elif current_user_id:
             # By default, a user sees tasks they created or tasks assigned to them
             query["$or"] = [
                 {"created_by": current_user_id},
