@@ -9,7 +9,11 @@ notifications_bp = Blueprint("notifications", __name__)
 @login_required
 def list_notifications():
     unread_only = request.args.get("unread_only", "false").lower() == "true"
-    limit = int(request.args.get("limit", 50))
+    limit_raw = request.args.get("limit", 50)
+    try:
+        limit = min(max(int(limit_raw), 1), 100)
+    except (ValueError, TypeError):
+        limit = 50
     notifs = notification_repository.find_by_user(
         user_id=g.current_user["id"],
         unread_only=unread_only,

@@ -2,7 +2,7 @@
 
 An enterprise-grade, high-performance Task Management System built with a strict **Three-Layer Architecture**: **Next.js + TypeScript** (Presentation Layer), **Flask + Python** (Business / Application Layer), and **MongoDB** (Persistence Layer), integrated with **Google OAuth 2.0** and **Gmail API**.
 
-[![Tests](https://img.shields.io/badge/Pytest-15%20Passed-emerald.svg)](backend/tests)
+[![Tests](https://img.shields.io/badge/Pytest-16%20Passed-emerald.svg)](backend/tests)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4%20Turbopack-black.svg)](frontend)
 [![Python](https://img.shields.io/badge/Python-3.14-blue.svg)](backend)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-forestgreen.svg)](docs/database.md)

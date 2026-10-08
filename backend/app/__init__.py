@@ -11,6 +11,7 @@ def create_app(config_class=None):
     if config_class is None:
         config_class = get_config()
     app.config.from_object(config_class)
+    app.url_map.strict_slashes = False
 
     # Enable CORS
     CORS(

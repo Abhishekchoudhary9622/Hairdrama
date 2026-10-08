@@ -42,11 +42,11 @@ function SidebarNavList({ onClose }: { onClose?: () => void }) {
         } else if (item.href === '/settings') {
           isActive = pathname.startsWith('/settings');
         } else if (pathname === '/tasks') {
-          if (item.href === '/tasks?view=assigned') {
+          if (item.name === 'My Tasks') {
             isActive = (currentView === 'assigned' && !currentStatus) || (!currentView && !currentStatus);
-          } else if (item.href === '/tasks?view=all') {
+          } else if (item.name === 'All Tasks') {
             isActive = currentView === 'all' && !currentStatus;
-          } else if (item.href === '/tasks?status=COMPLETED') {
+          } else if (item.name === 'Completed') {
             isActive = currentStatus === 'COMPLETED';
           }
         }

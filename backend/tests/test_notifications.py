@@ -27,3 +27,9 @@ def test_notification_flow(client, creator_headers, assignee_headers, assignee_u
     # 5. Verify unread count is 0
     res_after = client.get("/api/notifications", headers=assignee_headers)
     assert res_after.get_json()["data"]["unread_count"] == 0
+
+    # 6. Verify invalid/clamped limit query params handle gracefully
+    res_invalid_limit = client.get("/api/notifications?limit=invalid", headers=assignee_headers)
+    assert res_invalid_limit.status_code == 200
+    res_large_limit = client.get("/api/notifications?limit=9999", headers=assignee_headers)
+    assert res_large_limit.status_code == 200

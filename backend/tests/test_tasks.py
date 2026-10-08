@@ -103,3 +103,10 @@ def test_task_stats(client, creator_headers, assignee_user):
     assert "in_progress" in data
     assert "completed" in data
     assert "overdue" in data
+
+def test_task_trailing_slash_tolerance(client, creator_headers):
+    # Both /api/tasks and /api/tasks/ should resolve cleanly without 404 or redirect error
+    res_no_slash = client.get("/api/tasks", headers=creator_headers)
+    assert res_no_slash.status_code == 200
+    res_slash = client.get("/api/tasks/", headers=creator_headers)
+    assert res_slash.status_code == 200
