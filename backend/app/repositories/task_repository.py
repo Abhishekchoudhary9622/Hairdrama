@@ -40,7 +40,12 @@ class TaskRepository:
         query: Dict[str, Any] = {}
 
         if status:
-            query["status"] = status
+            if status == "OVERDUE":
+                now_iso = datetime.now(timezone.utc).isoformat()
+                query["status"] = {"$ne": "COMPLETED"}
+                query["due_date"] = {"$lt": now_iso, "$ne": None}
+            else:
+                query["status"] = status
         if priority:
             query["priority"] = priority
         if assigned_to:
