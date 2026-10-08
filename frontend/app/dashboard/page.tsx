@@ -27,7 +27,7 @@ export default function DashboardPage() {
     updateStatus,
     reassignTask,
     deleteTask,
-  } = useTasks();
+  } = useTasks({ view: 'assigned' });
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);

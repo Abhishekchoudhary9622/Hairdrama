@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { BrandLogo } from '@/components/ui/BrandLogo';
-import { UserCheck, Shield, Mail, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowRight, User } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -57,7 +57,7 @@ export default function LoginPage() {
         )}
 
         {/* Primary Action: Google OAuth Button */}
-        <div className="space-y-2">
+        <div>
           <button
             type="button"
             onClick={loginWithGoogle}
@@ -84,26 +84,18 @@ export default function LoginPage() {
             </svg>
             <span>Continue with Google</span>
           </button>
-          <p className="text-[10px] text-[#8E8E93] text-center">
-            Secured via Google OAuth 2.0 verified identity
-          </p>
         </div>
 
-        {/* Section 27 Demo Switcher Separator */}
+        {/* Clean Divider */}
         <div className="relative flex items-center justify-center">
           <div className="border-t border-[#F0EAE1] w-full" />
-          <span className="bg-white px-3 text-[10px] text-[#8E8E93] uppercase tracking-wider font-bold absolute">
-            Section 27 Demonstration
+          <span className="bg-white px-3 text-[11px] text-[#A0988E] font-medium absolute">
+            or sign in with team demo account
           </span>
         </div>
 
-        {/* Two-User Quick Test Cards */}
+        {/* Team Demo Accounts */}
         <div className="space-y-2">
-          <div className="text-[11px] font-bold text-[#1A1A1A] flex items-center gap-1.5">
-            <UserCheck className="w-3.5 h-3.5 text-[#F15A24]" />
-            <span>Instant Test Personas (1-Click Switch)</span>
-          </div>
-
           <div className="grid grid-cols-2 gap-2.5">
             {/* Account A: Abhishek Verma */}
             <button
@@ -117,7 +109,7 @@ export default function LoginPage() {
                   Abhishek
                 </span>
                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF0E6] text-[#E65100] font-bold">
-                  Creator
+                  Product Manager
                 </span>
               </div>
               <div className="text-[10px] text-[#8E8E93] truncate">abhishek@hairdrama.tech</div>
@@ -135,7 +127,7 @@ export default function LoginPage() {
                   Rahul
                 </span>
                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#E6F7EC] text-[#1E8E3E] font-bold">
-                  Assignee
+                  Lead Engineer
                 </span>
               </div>
               <div className="text-[10px] text-[#8E8E93] truncate">rahul@hairdrama.tech</div>
@@ -143,12 +135,12 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Custom Email Fast Entry */}
+        {/* Custom Email Entry */}
         <form onSubmit={handleCustomSubmit} className="pt-2 border-t border-[#F5EFE9] space-y-2">
           <div className="flex gap-2">
             <input
               type="email"
-              placeholder="Or custom test email..."
+              placeholder="Enter work email address..."
               value={customEmail}
               onChange={(e) => setCustomEmail(e.target.value)}
               className="flex-1 px-3.5 py-2 bg-[#F7F2EC] border border-[#E5DDD2] rounded-full text-xs text-[#1A1A1A] placeholder-[#8E8E93] focus:outline-none focus:border-[#F15A24]"
@@ -156,29 +148,13 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting || !customEmail}
-              className="px-4 py-2 bg-[#F15A24] hover:bg-[#E04E1B] disabled:opacity-50 text-white text-xs font-bold rounded-full transition-colors flex items-center gap-1 shadow-xs"
+              className="px-4 py-2 bg-[#F15A24] hover:bg-[#E04E1B] disabled:opacity-50 text-white text-xs font-bold rounded-full transition-colors flex items-center gap-1 shadow-xs cursor-pointer"
             >
-              <span>Login</span>
+              <span>Sign In</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </form>
-
-        {/* Bottom System Certifications */}
-        <div className="pt-2 border-t border-[#F5EFE9] flex items-center justify-center gap-4 text-[10px] text-[#8E8E93]">
-          <div className="flex items-center gap-1">
-            <Shield className="w-3 h-3 text-[#F15A24]" />
-            <span>Google OAuth</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Mail className="w-3 h-3 text-[#22C55E]" />
-            <span>Gmail API</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-[#2563EB]" />
-            <span>MongoDB Atlas</span>
-          </div>
-        </div>
       </div>
     </div>
   );

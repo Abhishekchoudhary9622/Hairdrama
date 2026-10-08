@@ -8,9 +8,10 @@ import { Search, X } from 'lucide-react';
 interface TaskFiltersProps {
   filters: TaskFiltersState;
   onChange: (filters: TaskFiltersState) => void;
+  showViewTabs?: boolean;
 }
 
-export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
+export function TaskFilters({ filters, onChange, showViewTabs = false }: TaskFiltersProps) {
   const hasActiveFilters = Boolean(
     filters.search || filters.status || filters.priority || (filters.view && filters.view !== 'all')
   );
@@ -103,29 +104,31 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
       </div>
 
       {/* View Scope Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-        {[
-          { id: 'all', label: 'All Involved' },
-          { id: 'assigned', label: 'Assigned To Me' },
-          { id: 'created', label: 'Created By Me' },
-        ].map((tab) => {
-          const isSelected = (filters.view || 'all') === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => onChange({ ...filters, view: tab.id as any })}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                isSelected
-                  ? 'bg-[#141414] text-white shadow-xs'
-                  : 'bg-white border border-[#E8E1D9] text-[#777] hover:text-[#1A1A1A]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {showViewTabs && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+          {[
+            { id: 'all', label: 'All Involved' },
+            { id: 'assigned', label: 'Assigned To Me' },
+            { id: 'created', label: 'Created By Me' },
+          ].map((tab) => {
+            const isSelected = (filters.view || 'all') === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => onChange({ ...filters, view: tab.id as any })}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  isSelected
+                    ? 'bg-[#141414] text-white shadow-xs'
+                    : 'bg-white border border-[#E8E1D9] text-[#777] hover:text-[#1A1A1A]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import {
   LayoutDashboard,
   CheckSquare,
-  UserCheck,
+  Layers,
   CheckCircle2,
   Settings,
   Plus,
@@ -19,17 +19,59 @@ interface SidebarProps {
   onCreateTask?: () => void;
 }
 
-export function Sidebar({ className = '', onClose, onCreateTask }: SidebarProps) {
+function SidebarNavList({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentView = searchParams.get('view');
+  const currentStatus = searchParams.get('status');
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'My Tasks', href: '/tasks', icon: CheckSquare },
-    { name: 'Assigned', href: '/tasks?view=assigned', icon: UserCheck },
+    { name: 'My Tasks', href: '/tasks?view=assigned', icon: CheckSquare },
+    { name: 'All Tasks', href: '/tasks?view=all', icon: Layers },
     { name: 'Completed', href: '/tasks?status=COMPLETED', icon: CheckCircle2 },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
+  return (
+    <nav className="space-y-1.5">
+      {navItems.map((item) => {
+        let isActive = false;
+        if (item.href === '/dashboard') {
+          isActive = pathname === '/dashboard';
+        } else if (item.href === '/settings') {
+          isActive = pathname.startsWith('/settings');
+        } else if (pathname === '/tasks') {
+          if (item.href === '/tasks?view=assigned') {
+            isActive = currentView === 'assigned' || (!currentView && !currentStatus);
+          } else if (item.href === '/tasks?view=all') {
+            isActive = currentView === 'all';
+          } else if (item.href === '/tasks?status=COMPLETED') {
+            isActive = currentStatus === 'COMPLETED';
+          }
+        }
+
+        return (
+          <Link
+            key={item.name}
+            href={item.href}
+            onClick={onClose}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-xs transition-all ${
+              isActive
+                ? 'bg-white text-[#F15A24] font-bold shadow-md'
+                : 'text-[#8E8E93] hover:text-white hover:bg-white/5 font-medium'
+            }`}
+          >
+            <item.icon className="w-4 h-4 flex-shrink-0" />
+            <span>{item.name}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function Sidebar({ className = '', onClose, onCreateTask }: SidebarProps) {
   return (
     <aside
       className={`w-60 bg-[#141414] text-white rounded-[24px] flex flex-col justify-between p-5 my-2 ml-2 select-none flex-shrink-0 shadow-xl ${className}`}
@@ -52,30 +94,10 @@ export function Sidebar({ className = '', onClose, onCreateTask }: SidebarProps)
           </button>
         </div>
 
-        {/* Navigation Items (Section 19: Dashboard, My Tasks, Assigned, Completed, Settings) */}
-        <nav className="space-y-1.5">
-          {navItems.map((item) => {
-            const isActive =
-              (item.href === '/dashboard' && pathname === '/dashboard') ||
-              (item.href !== '/dashboard' && pathname.startsWith(item.href.split('?')[0]));
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-xs transition-all ${
-                  isActive
-                    ? 'bg-white text-[#F15A24] font-bold shadow-md'
-                    : 'text-[#8E8E93] hover:text-white hover:bg-white/5 font-medium'
-                }`}
-              >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Navigation Items */}
+        <Suspense fallback={<nav className="space-y-1.5" />}>
+          <SidebarNavList onClose={onClose} />
+        </Suspense>
       </div>
 
       {/* Footer System Status Info */}

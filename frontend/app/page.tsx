@@ -106,7 +106,7 @@ export default function HomePage() {
             className="w-full sm:w-auto bg-white hover:bg-slate-50 text-[#1A1A1A] border border-[#DDD5CC] px-7 py-3.5 rounded-full text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2"
           >
             <UserCheck className="w-4 h-4 text-[#555]" />
-            <span>Test Two-User Flow (Sec 27)</span>
+            <span>Sign In with Team Account</span>
           </Link>
         </div>
 
