@@ -3,13 +3,15 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from pymongo import MongoClient
 
-def seed_database():
-    uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017/hairdrama_tasks")
-    db_name = os.getenv("MONGODB_DB_NAME", "hairdrama_tasks")
-
-    print(f"Connecting to MongoDB at {uri} (Database: {db_name})...")
-    client = MongoClient(uri, serverSelectionTimeoutMS=3000)
-    db = client[db_name]
+def seed_database(target_db=None):
+    if target_db is not None:
+        db = target_db
+    else:
+        uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017/hairdrama_tasks")
+        db_name = os.getenv("MONGODB_DB_NAME", "hairdrama_tasks")
+        print(f"Connecting to MongoDB at {uri} (Database: {db_name})...")
+        client = MongoClient(uri, serverSelectionTimeoutMS=3000)
+        db = client[db_name]
 
     now = datetime.now(timezone.utc)
     now_iso = now.isoformat()

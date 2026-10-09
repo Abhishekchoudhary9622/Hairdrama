@@ -39,7 +39,27 @@ def create_app(config_class=None):
         return jsonify({
             "status": "healthy",
             "service": "hairdrama-task-manager",
-            "database_mock": db.is_mock
+            "database_mock": db.is_mock,
+            "tasks_count": db.db["tasks"].count_documents({}) if db.db is not None else 0
         }), 200
+
+    @app.route("/api/seed", methods=["GET", "POST"])
+    def seed_data_endpoint():
+        try:
+            import sys
+            from pathlib import Path
+            backend_dir = Path(__file__).resolve().parent.parent
+            if str(backend_dir) not in sys.path:
+                sys.path.insert(0, str(backend_dir))
+            from migrations.seed_data import seed_database
+            seed_database(target_db=db.db)
+            return jsonify({
+                "success": True,
+                "message": "Database successfully seeded with realistic Hairdrama Tech data!",
+                "total_tasks": db.db["tasks"].count_documents({}),
+                "total_users": db.db["users"].count_documents({})
+            }), 200
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
 
     return app

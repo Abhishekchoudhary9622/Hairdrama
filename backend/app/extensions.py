@@ -39,6 +39,22 @@ class Database:
             self.db = self.client[db_name]
             self.is_mock = True
 
+        if not testing:
+            try:
+                task_count = self.db["tasks"].count_documents({})
+                if task_count == 0:
+                    import sys
+                    from pathlib import Path
+                    backend_dir = Path(__file__).resolve().parent.parent
+                    if str(backend_dir) not in sys.path:
+                        sys.path.insert(0, str(backend_dir))
+                    from migrations.seed_data import seed_database
+                    logger.info("Empty database detected. Automatically seeding initial users, tasks, and notifications...")
+                    seed_database(target_db=self.db)
+                    logger.info(f"Auto-seeding complete! Total tasks: {self.db['tasks'].count_documents({})}")
+            except Exception as seed_err:
+                logger.error(f"Failed to auto-seed database: {seed_err}")
+
     def get_collection(self, collection_name: str):
         if self.db is None:
             raise RuntimeError("Database has not been initialized. Call init_app first.")
